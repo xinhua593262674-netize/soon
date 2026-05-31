@@ -1,0 +1,49 @@
+name: 内容采集
+
+on:
+  schedule:
+    # 每天 3 次 (UTC 时间)
+    # 北京时间: 8:00, 14:00, 20:00
+    - cron: "0 0,6,12 * * *"
+  workflow_dispatch:
+    inputs:
+      board:
+        description: "板块 (ai-news / ai-tutorials / 留空=全部)"
+        required: false
+        default: ""
+
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 生成 Prisma Client
+        run: pnpm prisma:generate
+
+      - name: 运行采集
+        run: |
+          if [ -n "${{ github.event.inputs.board }}" ]; then
+            pnpm --filter @jiazhuang/crawler crawl --board "${{ github.event.inputs.board }}"
+          else
+            pnpm --filter @jiazhuang/crawler crawl
+          fi
