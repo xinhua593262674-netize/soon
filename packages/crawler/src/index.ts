@@ -18,6 +18,7 @@ import { crawlBilibili } from "./platforms/bilibili"
 import { crawlYouTube } from "./platforms/youtube"
 import { evaluate, type EvalInput } from "./eval/evaluator-adapter"
 import type { TopicKeywords } from "./eval/topics-adapter"
+import { translateItem } from "./translate"
 
 const db = new PrismaClient()
 
@@ -124,6 +125,9 @@ async function main() {
         continue
       }
 
+      // 3.5 翻译为中文
+      const { titleZh, summaryZh } = await translateItem(item)
+
       // 4. 写入数据库
       const status =
         result.decision === "AUTO_PUBLISH"
@@ -133,24 +137,30 @@ async function main() {
             : "REJECTED"
 
       try {
+        const metadata = {
+          ...(item.metadata as any ?? {}),
+          titleEn: item.title,
+          summaryEn: item.summary,
+        }
+
         await db.content.upsert({
           where: { url: item.url },
           update: {
-            title: item.title,
-            summary: item.summary,
+            title: titleZh || item.title,
+            summary: summaryZh || item.summary,
             thumbnailUrl: item.thumbnailUrl,
             status: status as any,
-            metadata: item.metadata as any,
+            metadata,
           },
           create: {
-            title: item.title,
+            title: titleZh || item.title,
             url: item.url,
-            summary: item.summary,
+            summary: summaryZh || item.summary,
             thumbnailUrl: item.thumbnailUrl,
             contentType: item.contentType,
             publishedAt: item.publishedAt,
             status: status as any,
-            metadata: item.metadata as any,
+            metadata,
             sourceId: item.sourceId,
             boardId: board.id,
           },
