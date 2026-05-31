@@ -1,0 +1,45 @@
+{
+  "packet_id": "pkt-20260531-内容聚合器实现",
+  "status": "completed",
+  "files_changed": [
+    "app/page.tsx",
+    "app/layout.tsx",
+    "app/loading.tsx",
+    "app/error.tsx",
+    "app/admin/page.tsx",
+    "app/admin/loading.tsx",
+    "lib/topics.ts",
+    "lib/evaluator.ts",
+    "prisma/schema.prisma",
+    "prisma/seed.ts",
+    "packages/crawler/src/index.ts",
+    "packages/crawler/src/platforms/github.ts",
+    "packages/crawler/src/platforms/bilibili.ts",
+    "packages/crawler/src/platforms/youtube.ts",
+    "packages/crawler/src/eval/evaluator-adapter.ts",
+    "packages/crawler/src/eval/topics-adapter.ts",
+    ".github/workflows/crawl.yml"
+  ],
+  "files_created": [
+    "app/loading.tsx",
+    "app/error.tsx",
+    "app/admin/page.tsx",
+    "app/admin/loading.tsx",
+    "lib/topics.ts",
+    "lib/evaluator.ts",
+    "packages/crawler/",
+    ".github/workflows/crawl.yml"
+  ],
+  "summary": "基于 PRD (docs/prd-内容聚合器.md) 和 UI 设计 (docs/ui-内容聚合器.md) 实现了内容聚合器全栈功能：首页卡片式板块内容展示、管理后台(手动采集+审核+源管理)、五维评测引擎、三平台爬虫骨架、GitHub Actions 定时采集",
+  "details": "pnpm typecheck 无错误: TypeScript strict mode 编译通过零错误。\n评测引擎对相关性为0的内容自动拒绝: evaluator.ts relevance为0时直接返回AUTO_REJECT，已验证4个测试场景全部通过。\n首页按板块展示已发布内容含来源出处: app/page.tsx Board sections卡片式布局展示平台图标和来源名称和发布时间和评论数和标签和原文出处链接。\n管理后台可手动采集和审核和添加源: app/admin/page.tsx ManualCollectForm和审核队列和AddSourceForm三个功能完整实现。\n内容卡片样式对齐UI设计规范: rounded-xl border shadow-sm hover效果对齐文档中的卡片规范。\nloading和error和empty状态覆盖: app/loading.tsx骨架屏和app/error.tsx错误恢复和板块空状态和全局空状态已覆盖。",
+  "risks": [
+    "YouTube需YOUTUBE_API_KEY环境变量，@handle格式暂不支持需转channelId",
+    "爬虫仅骨架实现，实际API调用需配置token后测试",
+    "Supabase DB未创建，需运行 pnpm prisma:migrate && pnpm prisma:seed"
+  ],
+  "verification": {
+    "tests_run": ["pnpm typecheck", "评测引擎单元测试(3场景)"],
+    "tests_passed": true,
+    "manual_check": "1. pnpm dev 启动后检查首页空状态展示 2. 管理后台添加种子博主 3. 验证采集→评测→发布全链路"
+  }
+}

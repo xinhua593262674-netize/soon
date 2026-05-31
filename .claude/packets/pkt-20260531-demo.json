@@ -1,0 +1,35 @@
+{
+  "packet_id": "pkt-20260531-demo",
+  "task": "补齐假装社区产品/设计/开发/测试流程文档，并生成示例 Packet 和交付指南",
+  "scope": {
+    "files": [
+      "docs/流程执行指南.md",
+      "docs/prd-帖子发布与展示.md",
+      "docs/ui-帖子发布与展示.md",
+      ".claude/packets/pkt-20260531-demo.json"
+    ],
+    "max_files": 5,
+    "read_only": [
+      ".claude/orchestrator.md",
+      ".claude/roles/product.md",
+      ".claude/roles/ui.md",
+      ".claude/roles/dev.md",
+      ".claude/roles/test.md"
+    ]
+  },
+  "dependencies": [],
+  "acceptance": [
+    "docs/流程执行指南.md 存在，说明产品、UI、开发、测试角色流程",
+    "docs/prd-帖子发布与展示.md 存在，且包含用户故事和验收标准",
+    "docs/ui-帖子发布与展示.md 存在，且包含页面线框、组件规范和响应式建议",
+    ".claude/packets/pkt-20260531-demo.json 存在，且符合 Packet schema"
+  ],
+  "risk_mode": "standard",
+  "role": "product",
+  "contract_freeze": [
+    "docs/流程执行指南.md"
+  ],
+  "budget_hint": 20000,
+  "created_by": "orchestrator",
+  "created_at": "2026-05-31T00:00:00Z"
+}

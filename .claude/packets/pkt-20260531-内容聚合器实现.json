@@ -1,0 +1,40 @@
+{
+  "packet_id": "pkt-20260531-内容聚合器实现",
+  "task": "基于 docs/prd-内容聚合器.md 和 docs/ui-内容聚合器.md 实现内容聚合器全栈功能",
+  "scope": {
+    "files": [
+      "app/page.tsx",
+      "app/layout.tsx",
+      "app/loading.tsx",
+      "app/error.tsx",
+      "app/admin/page.tsx",
+      "app/admin/loading.tsx",
+      "lib/topics.ts",
+      "lib/evaluator.ts",
+      "prisma/schema.prisma",
+      "prisma/seed.ts",
+      "packages/crawler/src/index.ts",
+      "packages/crawler/src/platforms/github.ts",
+      "packages/crawler/src/platforms/bilibili.ts",
+      "packages/crawler/src/platforms/youtube.ts",
+      "packages/crawler/src/eval/evaluator-adapter.ts",
+      "packages/crawler/src/eval/topics-adapter.ts",
+      ".github/workflows/crawl.yml",
+      "docs/流程执行指南.md"
+    ],
+    "max_files": 20
+  },
+  "dependencies": [],
+  "acceptance": [
+    "pnpm typecheck 无错误",
+    "评测引擎对相关性为0的内容自动拒绝",
+    "首页按板块展示已发布内容含来源出处",
+    "管理后台可手动采集和审核和添加源",
+    "内容卡片样式对齐UI设计规范",
+    "loading和error和empty状态覆盖"
+  ],
+  "risk_mode": "standard",
+  "role": "dev",
+  "created_by": "orchestrator",
+  "created_at": "2026-05-31T10:00:00Z"
+}

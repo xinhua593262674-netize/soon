@@ -1,0 +1,22 @@
+{
+  "name": "@jiazhuang/crawler",
+  "version": "0.1.0",
+  "private": true,
+  "description": "假装社区 — 内容采集爬虫 (GitHub Actions 定时触发)",
+  "type": "module",
+  "scripts": {
+    "crawl": "tsx src/index.ts",
+    "crawl:all": "tsx src/index.ts --all",
+    "crawl:news": "tsx src/index.ts --board ai-news",
+    "crawl:tutorials": "tsx src/index.ts --board ai-tutorials"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

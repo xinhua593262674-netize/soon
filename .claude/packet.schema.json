@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jiazhuang-community.dev/packet.schema.json",
+  "title": "OMC Task Packet",
+  "description": "OMC 执行框架的结构化任务包定义。每个派发给 Agent 的任务必须符合此 Schema。",
+  "type": "object",
+  "required": ["packet_id", "task", "scope", "acceptance", "risk_mode", "role"],
+  "properties": {
+    "packet_id": {
+      "type": "string",
+      "pattern": "^pkt-[0-9]{8}-[0-9a-z]{3,8}$",
+      "description": "唯一任务包 ID，格式: pkt-YYYYMMDD-随机标识"
+    },
+    "task": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 200,
+      "description": "一句话描述任务目标，必须具体可执行"
+    },
+    "scope": {
+      "type": "object",
+      "required": ["files", "max_files"],
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "maxItems": 20,
+          "description": "允许修改的文件列表（项目相对路径）"
+        },
+        "max_files": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "description": "最大允许修改的文件数量上限"
+        },
+        "read_only": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "只能读取不能修改的文件列表"
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "依赖的其他 packet_id 列表，必须等依赖完成才能开始"
+    },
+    "acceptance": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 5 },
+      "minItems": 1,
+      "maxItems": 10,
+      "description": "可验证的验收条件列表。每条必须具体、可机器检查。例如：'运行 pnpm test 全部通过'、'页面在 375px 宽度下无横向滚动'"
+    },
+    "risk_mode": {
+      "type": "string",
+      "enum": ["light", "standard", "heavy"],
+      "description": "风险模式: light=快速通道免Packet / standard=标准流程 / heavy=强制Barrier验收"
+    },
+    "role": {
+      "type": "string",
+      "enum": ["dev", "ui", "test", "product"],
+      "description": "执行角色"
+    },
+    "contract_freeze": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "本次任务期间冻结的共享接口/类型定义文件列表"
+    },
+    "budget_hint": {
+      "type": "integer",
+      "minimum": 1000,
+      "maximum": 500000,
+      "description": "预计 token 消耗上限"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "创建者标识（orchestrator 或 用户ID）",
+      "default": "orchestrator"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 创建时间戳"
+    },
+    "wave_id": {
+      "type": "string",
+      "description": "并行波次 ID。同一 wave 的 Packet 可以并行执行"
+    }
+  }
+}

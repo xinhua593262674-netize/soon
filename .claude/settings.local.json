@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import json; f=open\\('/Users/lixinhua/假装社区/.claude/settings.json'\\); d=json.load\\(f\\); print\\('✅ settings.json 合法 JSON'\\); print\\(f'  Version: {d[\\\\\"version\\\\\"]}'\\); print\\(f'  Model: {d[\\\\\"model\\\\\"]}'\\); h=d['hooks']; print\\(f'  Hooks: {len\\(h\\)} types'\\); [print\\(f'    {k}: {len\\(v\\)} matchers'\\) for k,v in h.items\\(\\)]\")",
+      "Bash(bash .claude/hooks/agent-return-gate.sh)",
+      "Bash(rm -f /Users/lixinhua/假装社区/.claude/packets/pkt-test001*.json)",
+      "WebSearch",
+      "Bash(mkdir -p /Users/lixinhua/假装社区/.claude/skills/grill-me)",
+      "Bash(unzip -o \"/Users/lixinhua/Downloads/skills-main \\(1\\).zip\" \"skills-main/skills/productivity/grill-me/*\" -d /tmp/tmp.XXXX)",
+      "Read(//private/tmp/skills-main/skills/productivity/grill-me/**)"
+    ],
+    "additionalDirectories": [
+      "/Users/lixinhua/假装社区/.claude/packets",
+      "/Users/lixinhua/假装社区/.claude/skills"
+    ]
+  }
+}

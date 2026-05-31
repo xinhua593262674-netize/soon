@@ -1,0 +1,226 @@
+// 假装社区 — 个人内容聚合器
+// 数据模型 v2.0
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// 板块
+// ============================================================
+model Board {
+  id          String    @id @default(cuid())
+  name        String   
+  slug        String    @unique
+  description String?  
+  keywords    Json      // { primary: string[], secondary: string[], tertiary: string[] }
+  order       Int       @default(0)
+
+  contents    Content[]
+  sources     Source[]
+  tags        Tag[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("boards")
+}
+
+// ============================================================
+// 博主 / UP主 / 仓库作者
+// ============================================================
+model Source {
+  id            String   @id @default(cuid())
+  platform      Platform
+  name          String  
+  url           String  
+  avatarUrl     String? 
+  followerCount Int      @default(0)
+  isSeed        Boolean  @default(false) // 手动添加的种子博主
+
+  boardId       String
+  board         Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  contents      Content[]
+
+  createdAt     DateTime @default(now())
+
+  @@unique([platform, url])
+  @@index([boardId])
+  @@index([platform])
+  @@map("sources")
+}
+
+enum Platform {
+  YOUTUBE
+  BILIBILI
+  GITHUB
+  // 预留扩展: XIAOHONGSHU DOUYIN
+}
+
+// ============================================================
+// 内容
+// ============================================================
+model Content {
+  id           String        @id @default(cuid())
+  title        String       
+  url          String        @unique
+  summary      String?       // AI 生成摘要
+  thumbnailUrl String?      
+  contentType  ContentType
+  publishedAt  DateTime
+  status       ContentStatus @default(PENDING)
+
+  // 元数据
+  metadata     Json? // { duration, stars, forks, viewCount, likeCount, tags: [...] }
+
+  // 关联
+  sourceId     String
+  source       Source        @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  boardId      String
+  board        Board         @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  comments          Comment[]
+  tags              ContentTag[]
+  evaluations       Evaluation[]
+	contentScenarios  ContentScenario[]
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([boardId, status])
+  @@index([sourceId])
+  @@index([publishedAt])
+  @@index([status])
+  @@map("contents")
+}
+
+enum ContentType {
+  VIDEO
+  ARTICLE
+  REPOSITORY
+}
+
+enum ContentStatus {
+  PUBLISHED
+  PENDING
+  REJECTED
+}
+
+// ============================================================
+// 评测记录
+// ============================================================
+model Evaluation {
+  id           String        @id @default(cuid())
+  contentId    String
+  content      Content       @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  // 五维评分 (0-5)
+  relevance    Float
+  quality      Float
+  freshness    Float
+  engagement   Float
+  completeness Float
+
+  // 加权总分
+  finalScore   Float
+
+  // 自动决策
+  decision     EvalDecision
+  reason       String?       // 评分理由
+
+  createdAt    DateTime      @default(now())
+
+  @@index([contentId])
+  @@map("evaluations")
+}
+
+enum EvalDecision {
+  AUTO_PUBLISH   // ≥ 3.5: 自动发布
+  MANUAL_REVIEW  // 2.5-3.5: 待审核
+  AUTO_REJECT    // < 2.5: 丢弃
+}
+
+// ============================================================
+// 标签（从关键词匹配自动生成）
+// ============================================================
+model Tag {
+  id       String       @id @default(cuid())
+  name     String      
+  boardId  String
+  board    Board        @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  contents ContentTag[]
+
+  @@unique([name, boardId])
+  @@map("tags")
+}
+
+model ContentTag {
+  contentId String
+  tagId     String
+
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([contentId, tagId])
+  @@map("content_tags")
+}
+
+// ============================================================
+// 源平台评论
+// ============================================================
+model Comment {
+  id           String   @id @default(cuid())
+  contentId    String
+  content      Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  body         String  
+  authorName   String  
+  authorAvatar String? 
+  likeCount    Int      @default(0)
+  platform     Platform
+
+  createdAt    DateTime @default(now())
+
+  @@index([contentId])
+  @@map("comments")
+}
+
+// ============================================================
+// 应用场景
+// ============================================================
+model Scenario {
+  id          String             @id @default(cuid())
+  name        String
+  slug        String             @unique
+  icon        String             // emoji, e.g. "🤖"
+  description String?
+  order       Int                @default(0)
+  isActive    Boolean            @default(true)
+
+  contents    ContentScenario[]
+
+  createdAt   DateTime           @default(now())
+
+  @@map("scenarios")
+}
+
+model ContentScenario {
+  contentId  String
+  scenarioId String
+  confidence Float?   // AI 置信度 0-100, null when manual
+  isManual   Boolean  @default(false)
+
+  content    Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  scenario   Scenario  @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@id([contentId, scenarioId])
+  @@map("content_scenarios")
+}
