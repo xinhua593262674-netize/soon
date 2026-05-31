@@ -627,3 +627,19 @@
   "reason": "未匹配任何路由规则",
   "trigger": "3"
 }
+{
+  "ts": "2026-05-31T11:35:27Z",
+  "event": "GateResolved",
+  "route": "none",
+  "confidence": "low",
+  "reason": "未匹配任何路由规则",
+  "trigger": "你设置"
+}
+{
+  "ts": "2026-05-31T11:42:59Z",
+  "event": "GateResolved",
+  "route": "none",
+  "confidence": "low",
+  "reason": "未匹配任何路由规则",
+  "trigger": "没找到"
+}
