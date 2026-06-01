@@ -56,13 +56,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const hasAnyContent = boards.some((b) => b.contents.length > 0)
   const searchParamObj: Record<string, string | undefined> = { period: sp.period, platform: sp.platform }
 
-  // 各平台内容计数
+  // 各平台内容计数 (数据库真实查询)
   const platformCounts = { bilibili: 0, youtube: 0, github: 0 }
-  for (const b of boards) {
-    for (const c of b.contents) {
-      const pt = c.source.platform.toLowerCase()
-      if (pt in platformCounts) platformCounts[pt as keyof typeof platformCounts]++
-    }
+  const platformAgg = await db.source.groupBy({
+    by: ["platform"],
+    where: { contents: { some: { status: "PUBLISHED", publishedAt: dateRange } } },
+    _count: { id: true },
+  })
+  for (const p of platformAgg) {
+    const pt = p.platform.toLowerCase()
+    if (pt in platformCounts) platformCounts[pt as keyof typeof platformCounts] = p._count.id
   }
 
   return (
