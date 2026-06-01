@@ -181,6 +181,28 @@ async function main() {
           },
         })
 
+        // 存储评论
+        const comments = ((item.metadata as any)?.comments ?? []) as any[]
+        if (comments.length > 0) {
+          for (const cmt of comments) {
+            try {
+              await db.comment.create({
+                data: {
+                  content: { connect: { url: item.url } },
+                  body: cmt.body ?? "",
+                  authorName: cmt.authorName ?? "匿名",
+                  authorAvatar: cmt.authorAvatar ?? "",
+                  likeCount: cmt.likeCount ?? 0,
+                  platform: cmt.platform ?? item.platform,
+                  createdAt: cmt.createdAt ? new Date(cmt.createdAt) : new Date(),
+                },
+              })
+            } catch {
+              // 评论入库失败不阻塞
+            }
+          }
+        }
+
         if (status === "PUBLISHED") totalPublished++
         else if (status === "PENDING") totalPending++
         else totalRejected++

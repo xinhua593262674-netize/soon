@@ -10,11 +10,7 @@
 
 import { db } from "@/lib/db"
 import { periodToDateRange, buildUrl } from "@/lib/periods"
-import { DateFilter } from "@/components/features/date-filter"
-import { Pagination } from "@/components/features/pagination"
-import { ScenarioChip } from "@/components/features/scenario-chip"
-import { ContentCard } from "@/components/features/content-card"
-import { FilterEmptyState } from "@/components/features/filter-empty-state"
+import { DateFilter, PlatformFilter, Pagination, ScenarioChip, ContentCard, FilterEmptyState } from "@/components"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
@@ -26,6 +22,7 @@ interface BoardPageProps {
   params: Promise<{ slug: string }>
   searchParams: Promise<{
     period?: string
+    platform?: string
     scenario?: string
     page?: string
   }>
@@ -43,11 +40,14 @@ export default async function BoardPage({ params, searchParams }: BoardPageProps
   const board = await db.board.findUnique({ where: { slug } })
   if (!board) notFound()
 
+  const platform = sp.platform || ""
+
   // 内容查询条件
   const where = {
     boardId: board.id,
     status: "PUBLISHED" as const,
     publishedAt: dateRange,
+    ...(platform ? { source: { platform: platform.toUpperCase() as any } } : {}),
     ...(sp.scenario
       ? { contentScenarios: { some: { scenario: { slug: sp.scenario } } } }
       : {}),
@@ -56,6 +56,7 @@ export default async function BoardPage({ params, searchParams }: BoardPageProps
   const basePath = `/boards/${slug}`
   const searchParamObj: Record<string, string | undefined> = {
     period: sp.period,
+    platform: sp.platform,
     scenario: sp.scenario,
     page: String(page),
   }
@@ -122,6 +123,13 @@ export default async function BoardPage({ params, searchParams }: BoardPageProps
         {/* 日期筛选 */}
         <DateFilter
           currentPeriod={period}
+          basePath={basePath}
+          searchParams={searchParamObj}
+        />
+
+        {/* 平台筛选 */}
+        <PlatformFilter
+          currentPlatform={platform}
           basePath={basePath}
           searchParams={searchParamObj}
         />

@@ -643,3 +643,98 @@
   "reason": "未匹配任何路由规则",
   "trigger": "没找到"
 }
+{
+  "ts": "2026-05-31T12:00:55Z",
+  "event": "GateResolved",
+  "route": "none",
+  "confidence": "low",
+  "reason": "未匹配任何路由规则",
+  "trigger": "继续"
+}
+{
+  "ts": "2026-05-31T12:04:11Z",
+  "event": "GateResolved",
+  "route": "none",
+  "confidence": "low",
+  "reason": "未匹配任何路由规则",
+  "trigger": "跑的怎么样了"
+}
+{
+  "ts": "2026-05-31T12:18:43Z",
+  "event": "GateResolved",
+  "route": "product",
+  "confidence": "high",
+  "reason": "显式角色命令 /product",
+  "trigger": "/product"
+}
+{
+  "ts": "2026-05-31T12:25:18Z",
+  "event": "GateResolved",
+  "route": "dev",
+  "confidence": "medium",
+  "reason": "开发实现相关",
+  "trigger": "增加来源切换，B站、YouTube、GitHub；\n需要爬取评论；\n种子博主，你作为AI coding爱好者，以及对skill、mcp等工具在各个业务场景使用（做ppt，内容生成）等场景使用有特别大的"
+}
+{
+  "ts": "2026-05-31T12:27:31Z",
+  "event": "GateResolved",
+  "route": "none",
+  "confidence": "low",
+  "reason": "未匹配任何路由规则",
+  "trigger": "是的"
+}
+{
+  "ts": "2026-05-31T12:27:34Z",
+  "event": "DispatchDecision",
+  "decision": "allow",
+  "reason": "准入检查通过",
+  "tool": "Skill",
+  "active_tasks": 0
+}
+{
+  "ts": "2026-05-31T12:27:34Z",
+  "event": "AgentReturned",
+  "status": "quarantined",
+  "reason": "缺少report.json",
+  "tool": "Skill"
+}
+{
+  "ts": "2026-05-31T12:29:23Z",
+  "event": "GateResolved",
+  "route": "none",
+  "confidence": "low",
+  "reason": "未匹配任何路由规则",
+  "trigger": "设计图给我看一下"
+}
+{
+  "ts": "2026-05-31T12:29:57Z",
+  "event": "GateResolved",
+  "route": "none",
+  "confidence": "low",
+  "reason": "未匹配任何路由规则",
+  "trigger": "UI必须走open design进行设计"
+}
+{
+  "ts": "2026-05-31T12:34:17Z",
+  "event": "GateResolved",
+  "route": "none",
+  "confidence": "low",
+  "reason": "未匹配任何路由规则",
+  "trigger": "继续"
+}
+{
+  "ts": "2026-05-31T12:34:46Z",
+  "event": "GateResolved",
+  "route": "ui",
+  "confidence": "high",
+  "reason": "显式角色命令 /ui",
+  "trigger": "/ui"
+}
+{
+  "ts": "2026-06-01T01:51:36Z",
+  "event": "GateResolved",
+  "route": "dev",
+  "confidence": "high",
+  "reason": "显式角色命令 /dev",
+  "trigger": "/dev 开发"
+}

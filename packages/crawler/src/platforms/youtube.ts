@@ -18,6 +18,15 @@ interface YTSource {
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY ?? ""
 
+export interface YTComment {
+  authorName: string
+  authorAvatar: string
+  body: string
+  likeCount: number
+  platform: "YOUTUBE"
+  createdAt: Date
+}
+
 export async function crawlYouTube(sources: YTSource[]): Promise<CrawledItem[]> {
   if (!YOUTUBE_API_KEY) {
     console.warn("   ⚠️  未设置 YOUTUBE_API_KEY，跳过 YouTube 采集")
@@ -25,6 +34,35 @@ export async function crawlYouTube(sources: YTSource[]): Promise<CrawledItem[]> 
   }
 
   const items: CrawledItem[] = []
+
+  async function fetchComments(videoId: string): Promise<YTComment[]> {
+    try {
+      const url = new URL("https://www.googleapis.com/youtube/v3/commentThreads")
+      url.searchParams.set("part", "snippet")
+      url.searchParams.set("videoId", videoId)
+      url.searchParams.set("maxResults", "10")
+      url.searchParams.set("order", "relevance")
+      url.searchParams.set("key", YOUTUBE_API_KEY)
+
+      const res = await fetch(url.toString())
+      const json = await res.json() as any
+      const threads = json?.items ?? []
+
+      return threads.map((t: any) => {
+        const snippet = t.snippet?.topLevelComment?.snippet ?? {}
+        return {
+          authorName: snippet.authorDisplayName ?? "匿名",
+          authorAvatar: snippet.authorProfileImageUrl ?? "",
+          body: snippet.textDisplay ?? "",
+          likeCount: snippet.likeCount ?? 0,
+          platform: "YOUTUBE" as const,
+          createdAt: new Date(snippet.publishedAt ?? Date.now()),
+        }
+      })
+    } catch {
+      return []
+    }
+  }
 
   for (const source of sources) {
     // 从 URL 提取 channel ID 或使用 @handle
@@ -50,7 +88,10 @@ export async function crawlYouTube(sources: YTSource[]): Promise<CrawledItem[]> 
         if (v.id?.kind !== "youtube#video") continue
 
         const videoId = v.id?.videoId ?? ""
-        const snippet = v.snippet ?? {}
+        const snippet = v.snippet ?? ""
+
+        // 抓取评论
+        const comments = await fetchComments(videoId)
 
         items.push({
           title: snippet.title ?? "",
@@ -70,6 +111,7 @@ export async function crawlYouTube(sources: YTSource[]): Promise<CrawledItem[]> 
             videoId,
             channelId: snippet.channelId ?? "",
             channelTitle: snippet.channelTitle ?? "",
+            comments, // 附加评论数据
           },
         })
       }

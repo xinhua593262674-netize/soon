@@ -5,6 +5,7 @@
  * 用于首页、板块页、场景详情页。
  */
 
+import Link from "next/link"
 import Image from "next/image"
 import { ScenarioTag } from "./scenario-tag"
 
@@ -66,14 +67,12 @@ export function ContentCard({ content }: ContentCardProps) {
         <span className="mt-0.5 inline-flex flex-shrink-0 items-center gap-1 rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
           {platformIcon} {typeLabel}
         </span>
-        <a
-          href={content.url}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href={`/contents/${content.id}`}
           className="text-base font-semibold text-gray-900 transition-colors hover:text-primary-600"
         >
           {content.title}
-        </a>
+        </Link>
       </div>
 
       {/* AI 摘要 */}

@@ -10,18 +10,17 @@
 
 import { db } from "@/lib/db"
 import { periodToDateRange } from "@/lib/periods"
-import { DateFilter } from "@/components/features/date-filter"
-import { ScenarioCard } from "@/components/features/scenario-card"
-import { ContentCard } from "@/components/features/content-card"
+import { DateFilter, PlatformFilter, ScenarioCard, ContentCard } from "@/components"
 import Link from "next/link"
 
 interface HomePageProps {
-  searchParams: Promise<{ period?: string }>
+  searchParams: Promise<{ period?: string; platform?: string }>
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const sp = await searchParams
   const period = sp.period || "all"
+  const platform = sp.platform || ""
   const dateRange = periodToDateRange(period)
 
   // 并发查场景 + 板块
@@ -55,7 +54,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   ])
 
   const hasAnyContent = boards.some((b) => b.contents.length > 0)
-  const searchParamObj: Record<string, string | undefined> = { period: sp.period }
+  const searchParamObj: Record<string, string | undefined> = { period: sp.period, platform: sp.platform }
+
+  // 各平台内容计数
+  const platformCounts = { bilibili: 0, youtube: 0, github: 0 }
+  for (const b of boards) {
+    for (const c of b.contents) {
+      const pt = c.source.platform.toLowerCase()
+      if (pt in platformCounts) platformCounts[pt as keyof typeof platformCounts]++
+    }
+  }
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
@@ -90,12 +98,18 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </section>
       )}
 
-      {/* ─── 日期筛选 ─── */}
-      <section className="mb-8">
+      {/* ─── 筛选栏：日期 + 平台 ─── */}
+      <section className="space-y-3 mb-8">
         <DateFilter
           currentPeriod={period}
           basePath="/"
           searchParams={searchParamObj}
+        />
+        <PlatformFilter
+          currentPlatform={platform}
+          basePath="/"
+          searchParams={searchParamObj}
+          counts={platformCounts}
         />
       </section>
 
